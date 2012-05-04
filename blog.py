@@ -9,7 +9,7 @@ jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir), a
 
 class NewPostHandler(webapp.RequestHandler):
     def new_post_form(self, error_message="", subject="", content=""):
-        template = jinja_env.get_template("newpost.html")
+        template = jinja_env.get_template("blog-newpost.html")
         return self.response.out.write(template.render(error_message=error_message, subject=subject, blog=content))
 
     def get(self):

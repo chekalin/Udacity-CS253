@@ -1,24 +1,11 @@
 import cgi
+import os
 import string
 from google.appengine.ext import webapp
+import jinja2
 
-form = """
-    <html>
-      <head>
-        <title>Unit 2 Rot 13</title>
-      </head>
-
-      <body>
-        <h2>Enter some text to ROT13:</h2>
-        <form method="post">
-            <textarea name="text" style="height: 100px; width: 400px;">%(text)s</textarea>
-          <br>
-          <input type="submit">
-        </form>
-      </body>
-
-    </html>
-"""
+template_dir = os.path.join(os.path.dirname(__file__), 'templates')
+jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir), autoescape=True)
 
 def encode_char(letter):
     uppercase = string.uppercase
@@ -37,7 +24,7 @@ class Rot13Handler(webapp.RequestHandler):
     def print_form(self, text=""):
         text = cgi.escape(text)
         text = encode_rot13(text)
-        self.response.out.write(form % {"text" : text})
+        self.response.out.write(jinja_env.get_template("rot13.html").render(text=text))
 
     def post(self):
         text = self.request.get("text")

@@ -1,0 +1,23 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>New Blog Post</title>
+    <link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="/stylesheets/blog-newpost.css" />
+</head>
+<body>
+<h1>new post</h1>
+<form method="post">
+    <label>
+        subject
+        <input name="subject" class="input-xlarge" type="text" placeholder="Enter the subject of the post..." value="{{subject}}"/>
+    </label>
+    <label>
+        blog
+        <textarea name="content" placeholder="Enter the contents of the post...">{{blog}}</textarea>
+    </label>
+    <div class="error help-block">{{error_message}}</div>
+    <input type="submit" class="btn btn-primary" >
+</form>
+</body>
+</html>
