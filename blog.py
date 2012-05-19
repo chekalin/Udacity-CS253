@@ -1,6 +1,7 @@
 import os
 from google.appengine.ext import webapp, db
 import jinja2
+import json
 
 ERROR_MESSAGE = "subject and content, please!"
 
@@ -23,7 +24,7 @@ class NewPostHandler(webapp.RequestHandler):
         else:
             post = BlogPost(subject=subject, content=content)
             post.put()
-            self.redirect("/unit3/blog/" + str(post.key().id()))
+            self.redirect("/blog/" + str(post.key().id()))
 
 class BlogPost(db.Model):
     subject = db.StringProperty(required=True)
@@ -44,3 +45,24 @@ class PostPermalinkHandler(GenericBlogHandler):
     def get(self, post_id):
         post = BlogPost.get_by_id(int(post_id))
         return self.blog_form([post])
+
+class GenericJsonHandler(webapp.RequestHandler):
+    def generateJsonForPosts(self, posts):
+        content = [{'subject': post.subject,
+                    'content': post.content,
+                    'created': str(post.created.strftime('%a %b %d %H:%M:%S %Y'))
+        } for post in posts]
+        return json.dumps(content)
+
+
+class JsonPermalinkHandler(GenericJsonHandler):
+    def get(self, post_id):
+        posts = [BlogPost.get_by_id(int(post_id))]
+        self.response.headers['Content-Type'] = 'application/json'
+        self.response.out.write(self.generateJsonForPosts(posts))
+
+class JsonBlogHandler(GenericJsonHandler):
+    def get(self):
+        posts = db.GqlQuery("SELECT * FROM BlogPost ORDER BY created desc")
+        self.response.headers['Content-Type'] = 'application/json'
+        self.response.out.write(self.generateJsonForPosts(posts))

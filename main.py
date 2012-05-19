@@ -1,9 +1,10 @@
 import os
 from google.appengine.ext import webapp
 import jinja2
-from blog import NewPostHandler, PostPermalinkHandler, BlogHandler
+from blog import NewPostHandler, PostPermalinkHandler, BlogHandler, JsonPermalinkHandler, JsonBlogHandler
 from rot13 import Rot13Handler
 from signup import SignupHandler, WelcomeHandler
+from registration import RegistrationHandler, WelcomeHandler2, LoginHandler, LogoutHandler
 
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir), autoescape=True)
@@ -19,6 +20,14 @@ app = webapp.WSGIApplication([
                               ('/unit2/signup', SignupHandler),
                               ('/unit2/welcome', WelcomeHandler),
                               ('/unit3/blog/newpost', NewPostHandler),
-                              ('/unit3/blog/(\d+)', PostPermalinkHandler),
-                              ('/unit3/blog', BlogHandler)
+                              ('/blog/welcome', WelcomeHandler2),
+                              ('/blog/login', LoginHandler),
+                              ('/blog/logout', LogoutHandler),
+                              ('/blog', BlogHandler),
+                              ('/blog/signup', RegistrationHandler),
+                              ('/blog/newpost', NewPostHandler),
+                              ('/blog/(\d+)', PostPermalinkHandler),
+                              ('/blog/(\d+).json', JsonPermalinkHandler),
+                              ('/blog.json', JsonBlogHandler),
+                              ('/blog/.json', JsonBlogHandler)
                              ], debug=True)

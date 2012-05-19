@@ -1,0 +1,49 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Sign Up</title>
+    <link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap.css" />
+</head>
+
+<body>
+<h2>Signup</h2>
+<form method="post" class="form-horizontal">
+    <fieldset>
+        <div class="control-group{% if er_username: %} error {% endif %}">
+            <label class="control-label" for="username">Username</label>
+            <div class="controls">
+                <input type="text" name="username" class="input-xlarge" id="username" value="{{username}}">
+                <span class="help-inline">{{er_username}}</span>
+            </div>
+        </div>
+        <div class="control-group{% if er_password: %} error {% endif %}">
+            <label class="control-label" for="password">Password</label>
+            <div class="controls">
+                <input type="password" name="password" class="input-xlarge" id="password">
+                <span class="help-inline">{{er_password}}</span>
+            </div>
+        </div>
+        <div class="control-group{% if er_verify: %} error {% endif %}">
+            <label class="control-label" for="verify">Verify Password</label>
+            <div class="controls">
+                <input type="password" name="verify" class="input-xlarge" id="verify">
+                <span class="help-inline">{{er_verify}}</span>
+            </div>
+        </div>
+        <div class="control-group{% if er_email: %} error {% endif %}">
+            <label class="control-label" for="email">Email (optional)</label>
+            <div class="controls">
+                <input type="text" name="email" class="input-xlarge" id="email" value="{{email}}">
+                <span class="help-inline">{{er_email}}</span>
+            </div>
+        </div>
+        <div class=form-actions>
+            <input type="submit" class="btn btn-primary">
+            <input type="button" value="Cancel" class="btn " onClick="parent.location='/'">
+        </div>
+    </fieldset>
+</form>
+
+</body>
+
+</html>

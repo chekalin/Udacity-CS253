@@ -1,0 +1,33 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Sign Up</title>
+    <link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap.css" />
+</head>
+
+<body>
+<h2>Login</h2>
+<form method="post" class="form-horizontal">
+    <fieldset>
+        <div class="control-group{% if er_login: %} error {% endif %}">
+            <label class="control-label" for="username">Username</label>
+            <div class="controls">
+                <input type="text" name="username" class="input-xlarge" id="username" value="{{username}}">
+            </div>
+        </div>
+        <div class="control-group{% if er_login: %} error {% endif %}">
+            <label class="control-label" for="password">Password</label>
+            <div class="controls">
+                <input type="password" name="password" class="input-xlarge" id="password">
+                <span class="help-block">{{er_login}}</span>
+            </div>
+        </div>
+        <div class=form-actions>
+            <input type="submit" value="Login" class="btn btn-primary">
+        </div>
+    </fieldset>
+</form>
+
+</body>
+
+</html>
