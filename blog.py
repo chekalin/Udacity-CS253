@@ -44,7 +44,10 @@ class BlogHandler(GenericBlogHandler):
 class PostPermalinkHandler(GenericBlogHandler):
     def get(self, post_id):
         post = BlogPost.get_by_id(int(post_id))
-        return self.blog_form([post])
+        if post:
+            return self.blog_form([post])
+        else:
+            self.redirect("/blog")
 
 class GenericJsonHandler(webapp.RequestHandler):
     def generateJsonForPosts(self, posts):
@@ -57,9 +60,12 @@ class GenericJsonHandler(webapp.RequestHandler):
 
 class JsonPermalinkHandler(GenericJsonHandler):
     def get(self, post_id):
-        posts = [BlogPost.get_by_id(int(post_id))]
-        self.response.headers['Content-Type'] = 'application/json'
-        self.response.out.write(self.generateJsonForPosts(posts))
+        post = BlogPost.get_by_id(int(post_id))
+        if post:
+            self.response.headers['Content-Type'] = 'application/json'
+            self.response.out.write(self.generateJsonForPosts([post]))
+        else:
+            self.redirect("/blog")
 
 class JsonBlogHandler(GenericJsonHandler):
     def get(self):

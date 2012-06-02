@@ -19,15 +19,13 @@ app = webapp.WSGIApplication([
                               ('/unit2/rot13', Rot13Handler),
                               ('/unit2/signup', SignupHandler),
                               ('/unit2/welcome', WelcomeHandler),
-                              ('/unit3/blog/newpost', NewPostHandler),
                               ('/blog/welcome', WelcomeHandler2),
                               ('/blog/login', LoginHandler),
                               ('/blog/logout', LogoutHandler),
-                              ('/blog', BlogHandler),
-                              ('/blog/signup', RegistrationHandler),
-                              ('/blog/newpost', NewPostHandler),
+                              ('/blog/?', BlogHandler),
+                              ('/blog/signup/?', RegistrationHandler),
+                              ('/blog/newpost/?', NewPostHandler),
                               ('/blog/(\d+)', PostPermalinkHandler),
                               ('/blog/(\d+).json', JsonPermalinkHandler),
-                              ('/blog.json', JsonBlogHandler),
-                              ('/blog/.json', JsonBlogHandler)
+                              ('/blog/?.json', JsonBlogHandler)
                              ], debug=True)
