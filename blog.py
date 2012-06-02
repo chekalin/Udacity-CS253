@@ -1,12 +1,21 @@
 import os
+from google.appengine.api import memcache
 from google.appengine.ext import webapp, db
 import jinja2
 import json
+import time
 
 ERROR_MESSAGE = "subject and content, please!"
+KEY = 'TOP10'
 
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir), autoescape=True)
+
+def update_cache():
+    posts = db.GqlQuery("SELECT * FROM BlogPost ORDER BY created DESC LIMIT 10")
+    cache = (posts, time.time())
+    memcache.set(KEY, cache)
+    return cache
 
 class NewPostHandler(webapp.RequestHandler):
     def new_post_form(self, error_message="", subject="", content=""):
@@ -24,6 +33,7 @@ class NewPostHandler(webapp.RequestHandler):
         else:
             post = BlogPost(subject=subject, content=content)
             post.put()
+            update_cache()
             self.redirect("/blog/" + str(post.key().id()))
 
 class BlogPost(db.Model):
@@ -32,31 +42,42 @@ class BlogPost(db.Model):
     created = db.DateTimeProperty(auto_now_add=True)
 
 class GenericBlogHandler(webapp.RequestHandler):
-    def blog_form(self, posts):
+    def blog_form(self, posts, updated=0):
         template = jinja_env.get_template("blog.html")
-        return self.response.out.write(template.render(posts=posts))
+        return self.response.out.write(template.render(posts=posts, updated=updated))
+
+    def get_posts(self):
+        cache = memcache.get(KEY)
+        if cache is None:
+            cache = update_cache()
+        return cache
 
 class BlogHandler(GenericBlogHandler):
     def get(self):
-        posts = db.GqlQuery("SELECT * FROM BlogPost ORDER BY created desc")
-        return self.blog_form(posts)
+        cache = self.get_posts()
+        updated = int(time.time() - cache[1])
+        return self.blog_form(cache[0], updated)
 
 class PostPermalinkHandler(GenericBlogHandler):
     def get(self, post_id):
-        post = BlogPost.get_by_id(int(post_id))
-        if post:
-            return self.blog_form([post])
-        else:
-            self.redirect("/blog")
+        cache = memcache.get(post_id)
+        if cache is None:
+            post = BlogPost.get_by_id(int(post_id))
+            if post:
+                cache = (post, time.time())
+                memcache.set(post_id, cache)
+            else:
+                self.redirect("/blog")
+        updated = int(time.time() - cache[1])
+        return self.blog_form([cache[0]], updated)
 
-class GenericJsonHandler(webapp.RequestHandler):
+class GenericJsonHandler(GenericBlogHandler):
     def generateJsonForPosts(self, posts):
         content = [{'subject': post.subject,
                     'content': post.content,
                     'created': str(post.created.strftime('%a %b %d %H:%M:%S %Y'))
         } for post in posts]
         return json.dumps(content)
-
 
 class JsonPermalinkHandler(GenericJsonHandler):
     def get(self, post_id):
@@ -69,6 +90,11 @@ class JsonPermalinkHandler(GenericJsonHandler):
 
 class JsonBlogHandler(GenericJsonHandler):
     def get(self):
-        posts = db.GqlQuery("SELECT * FROM BlogPost ORDER BY created desc")
+        cache = self.get_posts()
         self.response.headers['Content-Type'] = 'application/json'
-        self.response.out.write(self.generateJsonForPosts(posts))
+        self.response.out.write(self.generateJsonForPosts(cache[0]))
+
+class FlushCachesHandler(webapp.RequestHandler):
+    def get(self):
+        memcache.flush_all()
+        self.redirect("/blog")

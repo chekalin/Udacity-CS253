@@ -1,7 +1,7 @@
 import os
 from google.appengine.ext import webapp
 import jinja2
-from blog import NewPostHandler, PostPermalinkHandler, BlogHandler, JsonPermalinkHandler, JsonBlogHandler
+from blog import NewPostHandler, PostPermalinkHandler, BlogHandler, JsonPermalinkHandler, JsonBlogHandler, FlushCachesHandler
 from rot13 import Rot13Handler
 from signup import SignupHandler, WelcomeHandler
 from registration import RegistrationHandler, WelcomeHandler2, LoginHandler, LogoutHandler
@@ -27,5 +27,7 @@ app = webapp.WSGIApplication([
                               ('/blog/newpost/?', NewPostHandler),
                               ('/blog/(\d+)', PostPermalinkHandler),
                               ('/blog/(\d+).json', JsonPermalinkHandler),
-                              ('/blog/?.json', JsonBlogHandler)
+                              ('/blog/?.json', JsonBlogHandler),
+                              ('/blog/flush', FlushCachesHandler),
+                              ('/flush', FlushCachesHandler)
                              ], debug=True)
